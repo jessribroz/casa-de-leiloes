@@ -1,5 +1,7 @@
 
 import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /*
@@ -140,18 +142,42 @@ public class listagemVIEW extends javax.swing.JFrame {
         
         ProdutosDAO produtosdao = new ProdutosDAO();
         
-        //produtosdao.venderProduto(Integer.parseInt(id));
+        produtosdao.venderProduto(Integer.parseInt(id));
         listarProdutos();
     }//GEN-LAST:event_btnVenderActionPerformed
 
     private void btnVendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVendasActionPerformed
-        //vendasVIEW vendas = new vendasVIEW(); 
-        //vendas.setVisible(true);
+        TelaVendas vendas = new TelaVendas(); 
+        vendas.setVisible(true);
     }//GEN-LAST:event_btnVendasActionPerformed
 
     private void btnVoltarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoltarActionPerformed
-        this.dispose();
+      try {
+        String id = id_produto_venda.getText().trim();
+        if (!id.isEmpty()) {
+            int produtoId = Integer.parseInt(id);
+            ProdutosDAO produtosdao = new ProdutosDAO();
+            produtosdao.venderProduto(produtoId);  // Chama o método para marcar o produto como vendido
+            listarProdutos();  // Atualiza a listagem após a venda
+        } else {
+            JOptionPane.showMessageDialog(this, "Por favor, insira um ID válido.", "Erro", JOptionPane.ERROR_MESSAGE);
+        }
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "ID inválido. Digite um número.", "Erro", JOptionPane.ERROR_MESSAGE);
+    }
     }//GEN-LAST:event_btnVoltarActionPerformed
+
+
+// Atualização da tabela de produtos na tela
+public void atualizarTabelaListagem() {
+    ProdutosDAO produtosDAO = new ProdutosDAO();
+    List<ProdutosDTO> produtos = produtosDAO.listarProdutos();  // Lista os produtos atualizados
+    DefaultTableModel model = (DefaultTableModel) listaProdutos.getModel();
+    model.setRowCount(0); // Limpa a tabela antes de recarregar
+    for (ProdutosDTO produto : produtos) {
+        model.addRow(new Object[]{produto.getId(), produto.getNome(), produto.getValor(), produto.getStatus()});
+    }
+}
 
     /**
      * @param args the command line arguments
@@ -181,10 +207,8 @@ public class listagemVIEW extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new listagemVIEW().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new listagemVIEW().setVisible(true);
         });
     }
 
@@ -218,8 +242,11 @@ public class listagemVIEW extends javax.swing.JFrame {
                     listagem.get(i).getStatus()
                 });
             }
-        } catch (Exception e) {
-        }
+      } catch (Exception e) {
+    e.printStackTrace(); // ou usar uma mensagem de erro mais amigável
+}
+
+
     
     }
 }
